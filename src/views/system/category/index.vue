@@ -1,13 +1,3 @@
-/******************************************************************************
- * 作者：kerwincui
- * 时间：2021-06-08
- * 邮箱：164770707@qq.com
- * 源码地址：https://gitee.com/kerwincui/wumei-smart
- * author: kerwincui
- * create: 2021-06-08
- * email：164770707@qq.com
- * source:https://github.com/kerwincui/wumei-smart
- ******************************************************************************/
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
@@ -96,7 +86,7 @@
         </template>
       </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"

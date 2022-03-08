@@ -1,13 +1,3 @@
-/******************************************************************************
- * 作者：kerwincui
- * 时间：2021-06-08
- * 邮箱：164770707@qq.com
- * 源码地址：https://gitee.com/kerwincui/wumei-smart
- * author: kerwincui
- * create: 2021-06-08
- * email：164770707@qq.com
- * source:https://github.com/kerwincui/wumei-smart
- ******************************************************************************/
 <template>
   <div class="app-container">
     <el-form
@@ -168,7 +158,11 @@
       <el-table-column label="信号" align="center" prop="rssi">
         <template slot-scope="scope" style="font-size: 40px">
           <div style="font-size: 30px">
-            <svg-icon v-if="scope.row.rssi >= '-55'" icon-class="wifi_4" />
+            <svg-icon v-if="scope.row.rssi === null" icon-class="wifi_0" />
+            <svg-icon
+              v-else-if="scope.row.rssi >= '-55'"
+              icon-class="wifi_4"
+            />
             <svg-icon
               v-else-if="scope.row.rssi >= '-70' && scope.row.rssi < '-55'"
               icon-class="wifi_3"
@@ -210,11 +204,22 @@
           <el-switch v-model="scope.row.isRfControl" :active-value=1 :inactive-value=0 disabled></el-switch>
         </template>
       </el-table-column>
-      <el-table-column
-        label="设备温度"
-        align="center"
-        prop="deviceTemperature"
-      />
+      <el-table-column label="设备温度" align="center" prop="deviceTemperature">
+        <template v-if="scope.row.deviceTemperature != null" slot-scope="scope">
+          {{scope.row.deviceTemperature+'℃'}}
+        </template>
+        <template v-else slot-scope="scope">
+          {{scope.row.deviceTemperature}}
+        </template>
+      </el-table-column>
+      <el-table-column label="设备满度" align="center" prop="full">
+        <template v-if="scope.row.full != null" slot-scope="scope">
+          {{scope.row.full+'%'}}
+        </template>
+        <template v-else slot-scope="scope">
+          {{scope.row.full}}
+        </template>
+      </el-table-column>
       <el-table-column label="配网地址" align="center" prop="networkAddress" />
       <!-- <el-table-column label="配网IP" align="center" prop="networkIp" /> -->
       <el-table-column
@@ -318,7 +323,7 @@
         </el-form-item>
       </el-form>
       <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="submitForm">确 定</el-button>        
+        <el-button type="primary" @click="submitForm">确 定</el-button>
         <el-button @click="cancel">取 消</el-button>
       </div>
     </el-dialog>
@@ -573,7 +578,7 @@
               </el-select>
             </el-form-item>
           </el-col>
-        </el-row>     
+        </el-row>
 
         <el-divider content-position="center"/>
                 <el-form-item label="重启" prop="isReset">
@@ -705,11 +710,9 @@ export default {
       triggerSourceOptions: [],
       // 彩灯模式字典
       lightModeOptions: [],
-      
+
       // 按键字典
       rfFuncOptions: [],
-      // 创建时间时间范围
-      daterangeCreateTime: [],
       // 查询参数
       queryParams: {
         pageNum: 1,
@@ -778,6 +781,7 @@ export default {
       }
       listDevice(this.queryParams).then(response => {
         this.deviceList = response.rows;
+        console.log(this.deviceList)
         this.total = response.total;
         this.loading = false;
       });
@@ -979,7 +983,7 @@ export default {
               if(!isApply){
                 this.statusOpen = false;
                 this.getList();
-              }              
+              }
             });
           }
         }
@@ -995,7 +999,7 @@ export default {
               if(!isApply){
                 this.setOpen = false;
                 this.getList();
-              }              
+              }
             });
           }
         }

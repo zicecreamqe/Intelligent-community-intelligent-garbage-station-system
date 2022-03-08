@@ -1,13 +1,3 @@
-/******************************************************************************
- * 作者：kerwincui
- * 时间：2021-06-08
- * 邮箱：164770707@qq.com
- * 源码地址：https://gitee.com/kerwincui/wumei-smart
- * author: kerwincui
- * create: 2021-06-08
- * email：164770707@qq.com
- * source:https://github.com/kerwincui/wumei-smart
- ******************************************************************************/
 <template>
   <div class="app-container">
     <el-form :model="queryParams" ref="queryForm" :inline="true" v-show="showSearch" label-width="68px">
@@ -143,7 +133,16 @@
       <el-table-column label="灯状态" align="center" prop="lightStatus"  />
       <el-table-column label="在线" align="center" prop="isOnline" />
       <el-table-column label="信号" align="center" prop="rssi" />
-      <el-table-column label="设备温度" align="center" prop="deviceTemperature" />      
+      <el-table-column label="满度" align="center" prop="full">
+        <template v-if="scope.row.full != null" slot-scope="scope">
+          {{scope.row.full+'%'}}
+        </template>
+        <template v-else slot-scope="scope">
+          {{scope.row.full}}
+        </template>
+      </el-table-column>
+
+      <el-table-column label="设备温度" align="center" prop="deviceTemperature" />
       <el-table-column label="空气温度" align="center" prop="airTemperature" />
       <el-table-column label="空气湿度" align="center" prop="airHumidity" />
       <el-table-column label="触发源" align="center" prop="triggerSource" :formatter="triggerSourceFormat" />
@@ -172,9 +171,8 @@
             v-hasPermi="['system:status:remove']"
           >删除</el-button>
         </template> -->
-      </el-table-column>
     </el-table>
-    
+
     <pagination
       v-show="total>0"
       :total="total"
@@ -387,7 +385,7 @@ export default {
         this.loading = false;
       });
     },
-    
+
     // 触发源字典翻译
     triggerSourceFormat(row, column) {
       return this.selectDictLabel(this.triggerSourceOptions, row.triggerSource);
