@@ -68,10 +68,16 @@ public class IotDeviceStatus extends BaseEntity {
     private BigDecimal deviceTemperature;
 
     /**
-     * 设备湿度
+     * 设备信号
      */
     @Excel(name = "信号")
     private Integer rssi;
+
+    /**
+     * 设备满度
+     */
+    @Excel(name = "信号")
+    private Integer full;
 
     /**
      * 空气温度
@@ -290,6 +296,14 @@ public class IotDeviceStatus extends BaseEntity {
         return delFlag;
     }
 
+    public Integer getFull() {
+        return full;
+    }
+
+    public void setFull(Integer full) {
+        this.full = full;
+    }
+
     @Override
     public String toString() {
         return new ToStringBuilder(this, ToStringStyle.MULTI_LINE_STYLE)
@@ -317,6 +331,7 @@ public class IotDeviceStatus extends BaseEntity {
                 .append("updateBy", getUpdateBy())
                 .append("updateTime", getUpdateTime())
                 .append("remark", getRemark())
+                .append("full",getFull())
                 .toString();
     }
 }

@@ -20,7 +20,7 @@ import java.math.BigDecimal;
 /**
  * 设备对象 iot_device
  *
- * @author kerwincui
+ * @author ztqees
  * @date 2021-05-06
  */
 public class IotDeviceListDto extends BaseEntity {
@@ -134,11 +134,25 @@ public class IotDeviceListDto extends BaseEntity {
     @Excel(name = "设备温度")
     private BigDecimal deviceTemperature;
 
+    public Integer getFull() {
+        return full;
+    }
+
+    public void setFull(Integer full) {
+        this.full = full;
+    }
+
     /**
      * 设备湿度
      */
     @Excel(name = "信号")
     private Integer rssi;
+
+    /**
+     * 设备满度
+     */
+    @Excel(name = "信号")
+    private Integer full;
 
     @Excel(name = "备注")
     private String  remark;
@@ -339,6 +353,7 @@ public class IotDeviceListDto extends BaseEntity {
                 .append("isOnline", getIsOnline())
                 .append("deviceTemperature", getDeviceTemperature())
                 .append("rssid", getRssi())
+                .append("full",getFull())
                 .toString();
     }
 }

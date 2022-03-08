@@ -32,7 +32,7 @@
 
     <sql id="selectIotDeviceStatusVo">
         select device_status_id, device_id, device_num, relay_status, light_status, is_online, device_temperature, rssi,
-        air_temperature, air_humidity, trigger_source, brightness, light_interval, light_mode,fade_time, red, green,
+        full, air_temperature, air_humidity, trigger_source, brightness, light_interval, light_mode,fade_time, red, green,
         blue, create_by, create_time, update_by, update_time, remark from iot_device_status
     </sql>
 
