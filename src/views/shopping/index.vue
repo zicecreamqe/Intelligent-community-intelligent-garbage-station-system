@@ -7,43 +7,19 @@
       v-show="showSearch"
       label-width="68px"
     >
-      <el-form-item label="设备编号" prop="deviceNum">
+      <el-form-item label="商品编号" prop="deviceNum">
         <el-input
-          v-model="queryParams.deviceNum"
+          v-model="queryParams.shoppingNumber"
           placeholder="请输入编号"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="分类" prop="categoryId">
-        <el-select
-          v-model="queryParams.categoryId"
-          placeholder="请选择分类"
-          clearable
-          size="small"
-        >
-          <el-option
-            v-for="category in categoryList"
-            :key="category.categoryId"
-            :label="category.categoryName"
-            :value="category.categoryId"
-          />
-        </el-select>
-      </el-form-item>
-      <el-form-item label="设备名称" prop="deviceName">
+      <el-form-item label="商品名称" prop="deviceName">
         <el-input
-          v-model="queryParams.deviceName"
+          v-model="queryParams.shoppingName"
           placeholder="请输入名称"
-          clearable
-          size="small"
-          @keyup.enter.native="handleQuery"
-        />
-      </el-form-item>
-      <el-form-item label="固件版本" prop="firmwareVersion">
-        <el-input
-          v-model="queryParams.firmwareVersion"
-          placeholder="请输入固件版本"
           clearable
           size="small"
           @keyup.enter.native="handleQuery"
@@ -76,10 +52,10 @@
           icon="el-icon-search"
           size="mini"
           @click="handleQuery"
-          >搜索</el-button
+        >搜索</el-button
         >
         <el-button icon="el-icon-refresh" size="mini" @click="resetQuery"
-          >重置</el-button
+        >重置</el-button
         >
       </el-form-item>
     </el-form>
@@ -92,7 +68,7 @@
           icon="el-icon-plus"
           size="mini"
           @click="handleAdd"
-          v-hasPermi="['system:device:add']"
+          v-hasPermi="['shopping:add']"
         >新增</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -103,7 +79,7 @@
           size="mini"
           :disabled="single"
           @click="handleUpdate"
-          v-hasPermi="['system:device:edit']"
+          v-hasPermi="['shopping:edit']"
         >修改</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -114,7 +90,7 @@
           size="mini"
           :disabled="multiple"
           @click="handleDelete"
-          v-hasPermi="['system:device:remove']"
+          v-hasPermi="['shopping:remove']"
         >删除</el-button>
       </el-col>
       <el-col :span="1.5">
@@ -124,7 +100,7 @@
           icon="el-icon-download"
           size="mini"
           @click="handleExport"
-          v-hasPermi="['system:device:export']"
+          v-hasPermi="['shopping:export']"
         >导出</el-button>
       </el-col>
       <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
@@ -132,96 +108,24 @@
 
     <el-table
       v-loading="loading"
-      :data="deviceList"
+      :data="shoppingList"
       @selection-change="handleSelectionChange"
       border
       :row-class-name="tableRowClassName"
     >
       <el-table-column type="selection" width="45" align="center" />
-      <el-table-column label="序号" width="50" align="center" prop="deviceId" />
-      <el-table-column label="编号" align="center" prop="deviceNum" />
-      <el-table-column label="名称" align="center" prop="deviceName" />
-      <el-table-column
-        label="分类"
-        align="center"
-        prop="categoryId"
-        :formatter="categoryFormat"
-      />
-      <el-table-column label="用户" align="center" prop="nickName" />
-      <el-table-column label="固件版本" align="center" prop="firmwareVersion" />
-      <el-table-column label="在线" align="center" prop="isOnline">
-        <template slot-scope="scope">
-          <el-switch v-model="scope.row.isOnline" :active-value=1 :inactive-value=0 active-color="#13ce66" disabled></el-switch>
-        </template>
-      </el-table-column>
-      <!-- wifi信号强度(信号极好4格[-55—— 0]，信号好3格[-70—— -55），信号一般2格[-85—— -70），信号差1格[-100—— -85）) -->
-      <el-table-column label="信号" align="center" prop="rssi">
-        <template slot-scope="scope" style="font-size: 40px">
-          <div style="font-size: 30px">
-            <svg-icon v-if="scope.row.rssi === null" icon-class="wifi_0" />
-            <svg-icon
-              v-else-if="scope.row.rssi >= '-55'"
-              icon-class="wifi_4"
-            />
-            <svg-icon
-              v-else-if="scope.row.rssi >= '-70' && scope.row.rssi < '-55'"
-              icon-class="wifi_3"
-            />
-            <svg-icon
-              v-else-if="scope.row.rssi >= '-85' && scope.row.rssi < '-70'"
-              icon-class="wifi_2"
-            />
-            <svg-icon
-              v-else-if="scope.row.rssi >= '-100' && scope.row.rssi < '-85'"
-              icon-class="wifi_1"
-            />
-            <svg-icon v-else icon-class="wifi_0" />
-          </div>
-        </template>
-      </el-table-column>
-      <el-table-column label="继电器" align="center" prop="relayStatus">
-        <template slot-scope="scope">
-          <el-switch v-model="scope.row.relayStatus" :active-value=1 :inactive-value=0 active-color="#13ce66" disabled></el-switch>
-        </template>
-      </el-table-column>
-      <el-table-column label="灯状态" align="center" prop="lightStatus">
-        <template slot-scope="scope">
-          <el-switch v-model="scope.row.lightStatus" :active-value=1 :inactive-value=0 active-color="#13ce66" disabled></el-switch>
-        </template>
-      </el-table-column>
-      <el-table-column label="雷达感应" align="center" prop="isRadar">
-        <template slot-scope="scope">
-          <el-switch v-model="scope.row.isRadar" :active-value=1 :inactive-value=0 disabled></el-switch>
-        </template>
-      </el-table-column>
-      <el-table-column label="报警" align="center" prop="isAlarm">
-        <template slot-scope="scope">
-          <el-switch v-model="scope.row.isAlarm" :active-value=1 :inactive-value=0 disabled></el-switch>
-        </template>
-      </el-table-column>
-      <el-table-column label="遥控" align="center" prop="isRfControl">
-        <template slot-scope="scope">
-          <el-switch v-model="scope.row.isRfControl" :active-value=1 :inactive-value=0 disabled></el-switch>
-        </template>
-      </el-table-column>
-      <el-table-column label="设备温度" align="center" prop="deviceTemperature">
-        <template v-if="scope.row.deviceTemperature != null" slot-scope="scope">
-          {{scope.row.deviceTemperature+'℃'}}
-        </template>
-        <template v-else slot-scope="scope">
-          {{scope.row.deviceTemperature}}
-        </template>
-      </el-table-column>
-      <el-table-column label="设备满度" align="center" prop="full">
-        <template v-if="scope.row.full != null" slot-scope="scope">
-          {{scope.row.full+'%'}}
+      <el-table-column label="序号" width="50" align="center" prop="shoppingId" />
+      <el-table-column label="商品编号" align="center" prop="shoppingNumber" />
+      <el-table-column label="商品名称" align="center" prop="shoppingName" />
+      <el-table-column label="用户" align="center" prop="shoppingCreateBy" />
+      <el-table-column label="所需积分" align="center" prop="shoppingIntegral">
+        <template v-if="scope.row.shoppingIntegral != null" slot-scope="scope">
+          {{scope.row.full+'分'}}
         </template>
         <template v-else slot-scope="scope">
           {{scope.row.full}}
         </template>
       </el-table-column>
-      <el-table-column label="配网地址" align="center" prop="networkAddress" />
-      <!-- <el-table-column label="配网IP" align="center" prop="networkIp" /> -->
       <el-table-column
         label="创建时间"
         align="center"
@@ -232,7 +136,7 @@
           <span>{{ parseTime(scope.row.createTime, "{y}-{m}-{d}") }}</span>
         </template>
       </el-table-column>
-
+      <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column
         label="操作"
         align="center"
@@ -243,34 +147,18 @@
           <el-button
             size="mini"
             type="text"
-            icon="el-icon-view"
-            @click="handleStatus(scope.row)"
-            v-hasPermi="['system:device:edit']"
-            >状态</el-button
-          >
-          <el-button
-            size="mini"
-            type="text"
-            icon="el-icon-setting"
-            @click="handleSet(scope.row)"
-            v-hasPermi="['system:device:edit']"
-            >配置</el-button
-          >
-          <el-button
-            size="mini"
-            type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
             v-hasPermi="['system:device:edit']"
-            >修改</el-button
+          >修改</el-button
           >
           <el-button
             size="mini"
             type="text"
             icon="el-icon-cloudy"
-            @click="handleMonitor(scope.row)"
+            @click="handleDelete(scope.row)"
             v-hasPermi="['system:device:edit']"
-            >监控</el-button
+          >删除</el-button
           >
         </template>
       </el-table-column>
@@ -416,7 +304,7 @@
           </el-col>
           <el-col :span="24">
             <el-form-item label="红色" prop="red">
-               <el-slider
+              <el-slider
                 v-model="statusForm.red"
                 :max=255
                 show-input>
@@ -425,7 +313,7 @@
           </el-col>
           <el-col :span="24">
             <el-form-item label="绿色" prop="green">
-               <el-slider
+              <el-slider
                 v-model="statusForm.green"
                 :max=255
                 show-input>
@@ -434,7 +322,7 @@
           </el-col>
           <el-col :span="24">
             <el-form-item label="蓝色" prop="blue">
-               <el-slider
+              <el-slider
                 v-model="statusForm.blue"
                 :max=255
                 show-input>
@@ -478,56 +366,56 @@
     >
       <el-form ref="setForm" :model="setForm" :rules="rules" label-width="120px">
         <el-form-item label="雷达感应" prop="isRadar">
-            <el-switch
-                v-model="setForm.isRadar"
-                active-text="打开"
-                inactive-text="关闭"
-                :active-value=1 :inactive-value=0 >
-              </el-switch>
+          <el-switch
+            v-model="setForm.isRadar"
+            active-text="打开"
+            inactive-text="关闭"
+            :active-value=1 :inactive-value=0 >
+          </el-switch>
         </el-form-item>
 
         <el-form-item label="报警" prop="isAlarm">
-            <el-switch
-                v-model="setForm.isAlarm"
-                active-text="打开"
-                inactive-text="关闭"
-                :active-value=1 :inactive-value=0 >
-              </el-switch>
+          <el-switch
+            v-model="setForm.isAlarm"
+            active-text="打开"
+            inactive-text="关闭"
+            :active-value=1 :inactive-value=0 >
+          </el-switch>
         </el-form-item>
 
         <el-form-item label="雷达感应间隔/s" prop="radarInterval">
           <el-slider
-                v-model="setForm.radarInterval"
-                :min=1
-                :max=60
-                show-input>
-              </el-slider>
+            v-model="setForm.radarInterval"
+            :min=1
+            :max=60
+            show-input>
+          </el-slider>
         </el-form-item>
 
         <el-divider content-position="center"/>
         <el-form-item label="射频遥控" prop="isRfControl">
-            <el-switch
-                v-model="setForm.isRfControl"
-                active-text="打开"
-                inactive-text="关闭"
-                :active-value=1 :inactive-value=0 >
-              </el-switch>
+          <el-switch
+            v-model="setForm.isRfControl"
+            active-text="打开"
+            inactive-text="关闭"
+            :active-value=1 :inactive-value=0 >
+          </el-switch>
         </el-form-item>
         <el-form-item label="遥控配对" prop="isRfLearn">
           <el-switch
-                v-model="setForm.isRfLearn"
-                active-text="打开"
-                inactive-text="关闭"
-                :active-value=1 :inactive-value=0 >
-              </el-switch>
+            v-model="setForm.isRfLearn"
+            active-text="打开"
+            inactive-text="关闭"
+            :active-value=1 :inactive-value=0 >
+          </el-switch>
         </el-form-item>
         <el-form-item label="遥控清码" prop="isRfClear">
           <el-switch
-                v-model="setForm.isRfClear"
-                active-text="打开"
-                inactive-text="关闭"
-                :active-value=1 :inactive-value=0 >
-              </el-switch>
+            v-model="setForm.isRfClear"
+            active-text="打开"
+            inactive-text="关闭"
+            :active-value=1 :inactive-value=0 >
+          </el-switch>
         </el-form-item>
         <el-row>
           <el-col :span="11">
@@ -581,21 +469,21 @@
         </el-row>
 
         <el-divider content-position="center"/>
-                <el-form-item label="重启" prop="isReset">
-            <el-switch
-                v-model="setForm.isReset"
-                active-text="打开"
-                inactive-text="关闭"
-                :active-value=1 :inactive-value=0 active-color="#f56c6c">
-              </el-switch>
+        <el-form-item label="重启" prop="isReset">
+          <el-switch
+            v-model="setForm.isReset"
+            active-text="打开"
+            inactive-text="关闭"
+            :active-value=1 :inactive-value=0 active-color="#f56c6c">
+          </el-switch>
         </el-form-item>
         <el-form-item label="打开AP" prop="isAp">
-           <el-switch
-                v-model="setForm.isAp"
-                active-text="打开"
-                inactive-text="关闭"
-                :active-value=1 :inactive-value=0 active-color="#f56c6c">
-              </el-switch>
+          <el-switch
+            v-model="setForm.isAp"
+            active-text="打开"
+            inactive-text="关闭"
+            :active-value=1 :inactive-value=0 active-color="#f56c6c">
+          </el-switch>
         </el-form-item>
 
         <!-- <el-form-item label="托管" prop="isHost">
@@ -614,52 +502,6 @@
         <el-button type="primary" @click="setSubmitForm(false)">确 定</el-button>
         <el-button type="success" @click="setSubmitForm(true)">应 用</el-button>
         <el-button @click="setCancel">取 消</el-button>
-      </div>
-    </el-dialog>
-
-
-    <!-- 监控对话框 -->
-    <el-dialog
-      :title="monitorTitle"
-      :visible.sync="monitorOpen"
-      width="80%"
-      append-to-body
-    >
-      <span class="demonstration">{{ "设备编号:" + monitorForm.deviceNum }}</span>
-      <el-form ref="monitorForm" :model="monitorForm" :rules="rules" label-width="120px">
-        <div class="demo-image">
-          <div class="block" v-for="fit in fits" :key="fit">
-            <el-image
-              style="width: 80%; height: 100%"
-              :src="url"
-              :fit="fit"></el-image>
-          </div>
-        </div>
-
-        <el-form-item label="监控左右幅度" prop="radarInterval">
-          <el-slider
-            v-model="monitorForm.radarInterval"
-            :min=1
-            :max=60
-            show-input>
-          </el-slider>
-        </el-form-item>
-
-        <el-divider content-position="center"/>
-        <el-form-item label="应用后重启" prop="isReset">
-          <el-switch
-            v-model="monitorForm.isReset"
-            active-text="打开"
-            inactive-text="关闭"
-            :active-value=1 :inactive-value=0 active-color="#f56c6c">
-          </el-switch>
-        </el-form-item>
-
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="monitorSubmitForm(false)">确 定</el-button>
-        <el-button type="success" @click="monitorSubmitForm(true)">应 用</el-button>
-        <el-button @click="monitorCancel">取 消</el-button>
       </div>
     </el-dialog>
   </div>
@@ -687,6 +529,7 @@ import {
 import { getNewStatus, updateStatus } from "@/api/system/status";
 import { getNewSet, updateSet } from "@/api/system/set";
 import { listCategory } from "@/api/system/category";
+import {shoppingList} from "../../api/system/shopping";
 
 export default {
   name: "Device",
@@ -707,16 +550,16 @@ export default {
       total: 0,
       // 设备表格数据
       deviceList: [],
+      //商品表格数据
+      shoppingList: [],
       // 弹出层标题
       title: "",
       statusTitle: "",
       setTitle: "",
-      monitorTitle: "",
       // 是否显示弹出层
       open: false,
       statusOpen: false,
       setOpen: false,
-      monitorOpen: false,
       // 创建时间时间范围
       daterangeCreateTime: [],
       // 分类
@@ -766,9 +609,9 @@ export default {
         pageNum: 1,
         pageSize: 10,
         groupId:0,
-        deviceNum: null,
+        shoppingNumber: null,
         categoryId: null,
-        deviceName: null,
+        shoppingName: null,
         firmwareVersion: null,
         ownerId: null,
         createTime: null
@@ -777,7 +620,6 @@ export default {
       form: {},
       statusForm: {},
       setForm: {},
-      monitorForm: {},
       // 表单校验
       rules: {
         deviceNum: [
@@ -792,16 +634,12 @@ export default {
         firmwareVersion: [
           {required:true,message:"版本号不能为空", trigger: "blur"}
         ],
-      },
-      //监控的东西
-      //fits: ['fill', 'contain', 'cover', 'none', 'scale-down'],
-      fits: ['scale-down'],
-      url: 'https://fuss10.elemecdn.com/e/5d/4a731a90594a4af544c0c25941171jpeg.jpeg'
+      }
     };
   },
   created() {
     this.getCategoryList();
-    this.getList();
+    this.getShoppingList();
     this.getDicts("iot_trigger_source").then(response => {
       this.triggerSourceOptions = response.data;
     });
@@ -822,6 +660,25 @@ export default {
       }
       return "";
     },
+    /** 查询商品列表 */
+    getShoppingList() {
+      this.loading = true;
+      this.queryParams.params = {};
+      if (null != this.daterangeCreateTime && "" != this.daterangeCreateTime) {
+        this.queryParams.params[
+          "beginCreateTime"
+          ] = this.daterangeCreateTime[0];
+        this.queryParams.params["endCreateTime"] = this.daterangeCreateTime[1];
+      }
+      shoppingList().then(response =>{
+        this.shoppingList = response.rows;
+        console.log(this.shoppingList);
+        this.total = response.total;
+        this.loading = false;
+      })
+    },
+
+
     /** 查询设备列表 */
     getList() {
       this.loading = true;
@@ -829,14 +686,14 @@ export default {
       if (null != this.daterangeCreateTime && "" != this.daterangeCreateTime) {
         this.queryParams.params[
           "beginCreateTime"
-        ] = this.daterangeCreateTime[0];
+          ] = this.daterangeCreateTime[0];
         this.queryParams.params["endCreateTime"] = this.daterangeCreateTime[1];
       }
       listDevice(this.queryParams).then(response => {
         this.deviceList = response.rows;
         console.log(this.deviceList)
-        this.total = response.total;
-        this.loading = false;
+        /*this.total = response.total;
+        this.loading = false;*/
       });
     },
     // 查询设备分类
@@ -1006,16 +863,6 @@ export default {
         this.setTitle = "设备配置";
       });
     },
-    /** 监控按钮操作 */
-    handleMonitor(row) {
-      this.reset();
-      const deviceId = row.deviceId || this.ids;
-      getNewSet(deviceId).then(response => {
-        this.monitorForm = response.data;
-        this.monitorOpen = true;
-        this.monitorTitle = "设备监控";
-      });
-    },
     /** 提交按钮 */
     submitForm() {
       this.$refs["form"].validate(valid => {
@@ -1071,8 +918,9 @@ export default {
     /** 删除按钮操作 */
     handleDelete(row) {
       const deviceIds = row.deviceId || this.ids;
+      const deviceName = row.deviceName;
       this.$confirm(
-        '是否确认删除设备编号为"' + deviceIds + '"的数据项?',
+        '是否确认删除商品名称为"' + deviceName + '"的所有数据项?',
         "警告",
         {
           confirmButtonText: "确定",

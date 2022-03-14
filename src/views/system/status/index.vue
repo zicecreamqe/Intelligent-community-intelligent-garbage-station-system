@@ -141,7 +141,6 @@
           {{scope.row.full}}
         </template>
       </el-table-column>
-
       <el-table-column label="设备温度" align="center" prop="deviceTemperature" />
       <el-table-column label="空气温度" align="center" prop="airTemperature" />
       <el-table-column label="空气湿度" align="center" prop="airHumidity" />
