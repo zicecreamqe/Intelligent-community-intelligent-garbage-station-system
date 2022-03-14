@@ -15,12 +15,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
-/**
- * 设备分类对象 iot_category
- *
- * @author kerwincui
- * @date 2021-05-07
- */
+
 public class IotCategory extends BaseEntity {
     private static final long serialVersionUID = 1L;
 

@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.ShoppingMapper">
+
+    <resultMap type="Shopping" id="ShoppingResult">
+        <result property="shoppingId" column="shopping_id"/>
+        <result property="shoppingNumber" column="shopping_number"/>
+        <result property="shoppingCreateBy" column="shopping_create_by"/>
+        <result property="shoppingIntegral" column="shopping_integral"/>
+        <result property="remark" column="shopping_remark"/>
+        <result property="shoppingCreateTime" column="shopping_create_time"/>
+    </resultMap>
+
+    <select id="selectShoppingList" resultType="com.ruoyi.system.domain.Shopping" resultMap="ShoppingResult">
+        select shopping_id, shopping_number, shopping_create_by,
+               shopping_integral, shopping_remark, shopping_create_time
+        from shopping;
+    </select>
+</mapper>
