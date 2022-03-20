@@ -44,6 +44,12 @@ public class Shopping extends BaseEntity {
     private String remark;
 
     /**
+     * 库存
+     */
+    @Excel(name = "库存")
+    private int shoppingStock;
+
+    /**
      * 创建时间
      */
     @Excel(name = "创建时间")
@@ -87,6 +93,14 @@ public class Shopping extends BaseEntity {
 
     public void setShoppingIntegral(int shoppingIntegral) {
         this.shoppingIntegral = shoppingIntegral;
+    }
+
+    public int getShoppingStock() {
+        return shoppingStock;
+    }
+
+    public void setShoppingStock(int shoppingStock) {
+        this.shoppingStock = shoppingStock;
     }
 
     @Override

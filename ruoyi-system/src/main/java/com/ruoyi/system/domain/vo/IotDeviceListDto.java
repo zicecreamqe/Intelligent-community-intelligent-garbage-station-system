@@ -134,6 +134,20 @@ public class IotDeviceListDto extends BaseEntity {
     @Excel(name = "设备温度")
     private BigDecimal deviceTemperature;
 
+    /**
+     * 设备湿度
+     */
+    @Excel(name = "设备湿度")
+    private BigDecimal deviceHumidity;
+
+    public BigDecimal getDeviceHumidity() {
+        return deviceHumidity;
+    }
+
+    public void setDeviceHumidity(BigDecimal deviceHumidity) {
+        this.deviceHumidity = deviceHumidity;
+    }
+
     public Integer getFull() {
         return full;
     }
@@ -143,7 +157,7 @@ public class IotDeviceListDto extends BaseEntity {
     }
 
     /**
-     * 设备湿度
+     * 设备信号
      */
     @Excel(name = "信号")
     private Integer rssi;
@@ -151,7 +165,7 @@ public class IotDeviceListDto extends BaseEntity {
     /**
      * 设备满度
      */
-    @Excel(name = "信号")
+    @Excel(name = "满度")
     private Integer full;
 
     @Excel(name = "备注")
@@ -354,6 +368,7 @@ public class IotDeviceListDto extends BaseEntity {
                 .append("deviceTemperature", getDeviceTemperature())
                 .append("rssid", getRssi())
                 .append("full",getFull())
+                .append("deviceHumidity",getDeviceHumidity())
                 .toString();
     }
 }

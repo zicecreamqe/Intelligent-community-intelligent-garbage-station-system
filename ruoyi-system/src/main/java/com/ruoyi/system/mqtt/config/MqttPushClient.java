@@ -22,7 +22,7 @@ import org.springframework.stereotype.Component;
  * @Classname MqttPushClient
  * @Description mqtt推送客户端
  */
-@Component
+//@Component
 @Primary
 public class MqttPushClient {
     private static final Logger logger = LoggerFactory.getLogger(MqttPushClient.class);

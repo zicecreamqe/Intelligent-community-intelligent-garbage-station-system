@@ -7,15 +7,17 @@
     <resultMap type="Shopping" id="ShoppingResult">
         <result property="shoppingId" column="shopping_id"/>
         <result property="shoppingNumber" column="shopping_number"/>
+        <result property="shoppingName" column="shopping_name"/>
         <result property="shoppingCreateBy" column="shopping_create_by"/>
         <result property="shoppingIntegral" column="shopping_integral"/>
+        <result property="shoppingStock" column="shopping_stock"/>
         <result property="remark" column="shopping_remark"/>
         <result property="shoppingCreateTime" column="shopping_create_time"/>
     </resultMap>
 
     <select id="selectShoppingList" resultType="com.ruoyi.system.domain.Shopping" resultMap="ShoppingResult">
-        select shopping_id, shopping_number, shopping_create_by,
-               shopping_integral, shopping_remark, shopping_create_time
+        select shopping_id, shopping_number, shopping_name, shopping_create_by,
+               shopping_stock, shopping_integral, shopping_remark, shopping_create_time
         from shopping;
     </select>
 </mapper>

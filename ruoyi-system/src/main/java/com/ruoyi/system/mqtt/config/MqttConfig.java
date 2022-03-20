@@ -19,8 +19,8 @@ import org.springframework.stereotype.Component;
  * @Classname MtqqEntity
  * @Description mqtt相关配置信息
  */
-@Component
-@ConfigurationProperties("spring.mqtt")
+//@Component
+//@ConfigurationProperties("spring.mqtt")
 public class MqttConfig {
     @Autowired
     private MqttPushClient mqttPushClient;

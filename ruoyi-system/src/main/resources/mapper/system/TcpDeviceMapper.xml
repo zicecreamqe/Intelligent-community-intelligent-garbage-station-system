@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.ruoyi.system.mapper.TcpDeviceMapper">
+    <update id="set">
+        update iot_device_status set full = #{full} , device_humidity = #{deviceHumidity} , device_temperature = #{deviceTemperature} where device_num = #{deviceNum}
+    </update>
+    <update id="setTemperature">
+        update iot_device_status set device_temperature = #{deviceTemperature} where device_num = #{deviceNum}
+    </update>
+    <update id="setFull">
+        update iot_device_status set full = #{full} where device_num = #{deviceNum}
+    </update>
+    <update id="setHumidity">
+        update iot_device_status set device_humidity = #{deviceHumidity} where device_num = #{deviceNum}
+    </update>
+</mapper>

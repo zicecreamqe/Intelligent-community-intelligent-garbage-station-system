@@ -28,8 +28,8 @@ import org.springframework.transaction.annotation.Transactional;
 public class IotDeviceServiceImpl implements IIotDeviceService {
     @Autowired
     private IotDeviceMapper iotDeviceMapper;
-    @Autowired
-    private MqttPushClient pushClient;
+    /*@Autowired
+    private MqttPushClient pushClient;*/
 
     @Autowired
     private ITUserAccountInfoService userAccountInfoService;
@@ -195,13 +195,15 @@ public class IotDeviceServiceImpl implements IIotDeviceService {
 //        content="{\"deviceId\":\"4\",\"params\":{},\"relayStatus\":\"1\"}";
         System.out.println("topic:"+topic);
         System.out.println("content:"+content);
-        boolean publish = pushClient.publish(2, true, topic, content);
+        //ztqees暂时注释并暂时添加了一个return
+        /*boolean publish = pushClient.publish(2, true, topic, content);
         if(publish)
         {
             return 1;
         }else{
             throw new CustomException("指令发送失败");
-        }
+        }*/
+        return 0;
     }
 
     /**

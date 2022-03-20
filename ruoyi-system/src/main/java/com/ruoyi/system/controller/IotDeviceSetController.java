@@ -56,8 +56,8 @@ public class IotDeviceSetController extends BaseController {
     @Autowired
     private IIotDeviceService iotDeviceService;
 
-    @Autowired
-    private MqttPushClient mqttPushClient;
+    /*@Autowired
+    private MqttPushClient mqttPushClient;*/
 
     /**
      * 查询设备配置列表
@@ -192,21 +192,25 @@ public class IotDeviceSetController extends BaseController {
             set.setIsReset(iotDeviceSet.getIsReset());
         }
         String content = JSON.toJSONString(set);
-        boolean isSuccess = mqttPushClient.publish(0, true, "setting/set/" + set.getDeviceNum(), content);
+        //ztqees暂时注释，并return
+        /*boolean isSuccess = mqttPushClient.publish(0, true, "setting/set/" + set.getDeviceNum(), content);
         if (isSuccess) {
             return AjaxResult.success("mqtt 发布成功");
         }
-        return AjaxResult.error("mqtt 发布失败。");
+        return AjaxResult.error("mqtt 发布失败。");*/
+        return null;
     }
 
     @ApiOperation(value = "mqtt获取设备配置", notes = "mqtt获取设备配置")
     @GetMapping(value = "/getSetting/{deviceNum}")
     public AjaxResult getSetting(@PathVariable("deviceNum") String deviceNum) {
-        boolean isSuccess = mqttPushClient.publish(0, true, "setting/get/" + deviceNum, "wumei.live");
+        //ztqees暂时注释，并return
+        /*boolean isSuccess = mqttPushClient.publish(0, true, "setting/get/" + deviceNum, "wumei.live");
         if (isSuccess) {
             return AjaxResult.success("mqtt 发布成功");
         }
-        return AjaxResult.error("mqtt 发布失败。");
+        return AjaxResult.error("mqtt 发布失败。");*/
+        return null;
     }
 
     /**

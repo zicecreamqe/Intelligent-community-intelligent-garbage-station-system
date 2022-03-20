@@ -23,7 +23,7 @@ public class IotDeviceSetServiceImpl implements IIotDeviceSetService {
     /**
      * 查询设备配置
      *
-     * @param deviceConfigId 设备配置ID
+     * @param deviceSetId 设备配置ID
      * @return 设备配置
      */
     @Override

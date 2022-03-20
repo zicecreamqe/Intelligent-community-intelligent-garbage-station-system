@@ -38,7 +38,7 @@ import java.util.Random;
  * @Classname PushCallback
  * @Description 消费监听类
  */
-@Component
+//@Component
 public class PushCallback implements MqttCallback {
     private static final Logger logger = LoggerFactory.getLogger(MqttPushClient.class);
 
