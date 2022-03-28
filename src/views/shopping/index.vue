@@ -7,7 +7,7 @@
       v-show="showSearch"
       label-width="68px"
     >
-      <el-form-item label="商品编号" prop="deviceNum">
+      <el-form-item label="商品编号" prop="shoppingNumber">
         <el-input
           v-model="queryParams.shoppingNumber"
           placeholder="请输入编号"
@@ -16,7 +16,7 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="商品名称" prop="deviceName">
+      <el-form-item label="商品名称" prop="shoppingName">
         <el-input
           v-model="queryParams.shoppingName"
           placeholder="请输入名称"
@@ -25,9 +25,9 @@
           @keyup.enter.native="handleQuery"
         />
       </el-form-item>
-      <el-form-item label="用户" prop="ownerId">
+      <el-form-item label="用户" prop="shoppingCreateBy">
         <el-input
-          v-model="queryParams.ownerId"
+          v-model="queryParams.shoppingCreateBy"
           placeholder="请输入用户"
           clearable
           size="small"
@@ -99,11 +99,12 @@
           plain
           icon="el-icon-download"
           size="mini"
+          :disabled="single"
           @click="handleExport"
           v-hasPermi="['shopping:export']"
         >导出</el-button>
       </el-col>
-      <right-toolbar :showSearch.sync="showSearch" @queryTable="getList"></right-toolbar>
+      <right-toolbar :showSearch.sync="showSearch" @queryTable="getShoppingList"></right-toolbar>
     </el-row>
 
     <el-table
@@ -120,22 +121,23 @@
       <el-table-column label="用户" align="center" prop="shoppingCreateBy" />
       <el-table-column label="所需积分" align="center" prop="shoppingIntegral">
         <template v-if="scope.row.shoppingIntegral != null" slot-scope="scope">
-          {{scope.row.full+'分'}}
+          {{scope.row.shoppingIntegral+'分'}}
         </template>
         <template v-else slot-scope="scope">
-          {{scope.row.full}}
+          {{scope.row.shoppingIntegral}}
         </template>
       </el-table-column>
       <el-table-column
         label="创建时间"
         align="center"
-        prop="createTime"
+        prop="shoppingCreateTime"
         width="100"
       >
         <template slot-scope="scope">
-          <span>{{ parseTime(scope.row.createTime, "{y}-{m}-{d}") }}</span>
+          <span>{{ parseTime(scope.row.shoppingCreateTime, "{y}-{m}-{d}") }}</span>
         </template>
       </el-table-column>
+      <el-table-column label="库存" align="center" prop="shoppingStock" />
       <el-table-column label="备注" align="center" prop="remark" />
       <el-table-column
         label="操作"
@@ -149,7 +151,7 @@
             type="text"
             icon="el-icon-edit"
             @click="handleUpdate(scope.row)"
-            v-hasPermi="['system:device:edit']"
+            v-hasPermi="['system:shopping:edit']"
           >修改</el-button
           >
           <el-button
@@ -157,7 +159,7 @@
             type="text"
             icon="el-icon-cloudy"
             @click="handleDelete(scope.row)"
-            v-hasPermi="['system:device:edit']"
+            v-hasPermi="['system:shopping:edit']"
           >删除</el-button
           >
         </template>
@@ -169,38 +171,29 @@
       :total="total"
       :page.sync="queryParams.pageNum"
       :limit.sync="queryParams.pageSize"
-      @pagination="getList"
+      @pagination="getShoppingList()"
     />
 
     <!-- 添加或修改设备对话框 -->
     <el-dialog :title="title" :visible.sync="open" width="500px" append-to-body>
       <el-form ref="form" :model="form" :rules="rules" label-width="80px">
-        <el-form-item label="编号" prop="deviceNum">
+        <el-form-item label="编号" prop="shoppingNumber">
           <el-input
-            v-model="form.deviceNum"
+            v-model="form.shoppingNumber"
             placeholder="请输入编号，必须唯一"
           />
         </el-form-item>
-        <el-form-item label="分类" prop="categoryId">
-          <el-select
-            v-model="form.categoryId"
-          >
-            <el-option
-              v-for="category in categoryList"
-              :key="category.categoryId"
-              :label="category.categoryName"
-              :value="category.categoryId"
-            />
-          </el-select>
-        </el-form-item>
-        <el-form-item label="固件版本" prop="firmwareVersion">
+        <el-form-item label="商品名称" prop="shoppingName">
           <el-input
-            v-model="form.firmwareVersion"
-            placeholder="请输入固件版本,例如1.0"
+            v-model="form.shoppingName"
+            placeholder="请输入商品名称,例如旺旺碎冰冰"
           />
         </el-form-item>
-        <el-form-item label="名称" prop="deviceName">
-          <el-input v-model="form.deviceName" placeholder="请输入名称" />
+        <el-form-item label="所需积分" prop="shoppingIntegral">
+          <el-input v-model="form.shoppingIntegral" placeholder="请输入该商品所需要多少的积分" />
+        </el-form-item>
+        <el-form-item label="当前库存" prop="shoppingStock">
+          <el-input v-model="form.shoppingStock" placeholder="请输入该商品目前仓库中的存量" />
         </el-form-item>
         <el-form-item label="备注" prop="remark">
           <el-input
@@ -216,294 +209,6 @@
       </div>
     </el-dialog>
 
-    <!-- 添加或修改设备状态对话框 -->
-    <el-dialog
-      :title="statusTitle"
-      :visible.sync="statusOpen"
-      width="630px"
-      append-to-body
-    >
-      <el-form
-        ref="statusForm"
-        :model="statusForm"
-        :rules="rules"
-        label-width="120px"
-      >
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="继电器" prop="relayStatus">
-              <el-switch
-                v-model="statusForm.relayStatus"
-                active-text="打开"
-                inactive-text="关闭"
-                :active-value=1 :inactive-value=0 active-color="#13ce66">
-              </el-switch>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24" :offset="0">
-            <el-form-item label="灯状态" prop="lightStatus">
-              <el-switch
-                v-model="statusForm.lightStatus"
-                active-text="打开"
-                inactive-text="关闭"
-                :active-value=1 :inactive-value=0 active-color="#13ce66">
-              </el-switch>
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="彩灯模式" prop="lightMode">
-              <el-select
-                v-model="statusForm.lightMode"
-                placeholder="请选择彩灯模式"
-              >
-                <el-option
-                  v-for="dict in lightModeOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictLabel"
-                  :value="parseInt(dict.dictValue)"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="24">
-            <el-form-item label="渐变间隔/ms" prop="lightInterval">
-              <el-slider
-                v-model="statusForm.lightInterval"
-                :min=0
-                :max=1500
-                show-input>
-              </el-slider>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24" :offset="0">
-            <el-form-item label="渐变时间/ms" prop="fadeTime">
-              <el-slider
-                v-model="statusForm.fadeTime"
-                :min=0
-                :max=1500
-                show-input>
-              </el-slider>
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-row>
-          <el-col :span="24" >
-            <el-form-item label="亮度" prop="brightness">
-              <el-slider
-                v-model="statusForm.brightness"
-                show-input>
-              </el-slider>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="红色" prop="red">
-              <el-slider
-                v-model="statusForm.red"
-                :max=255
-                show-input>
-              </el-slider>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="绿色" prop="green">
-              <el-slider
-                v-model="statusForm.green"
-                :max=255
-                show-input>
-              </el-slider>
-            </el-form-item>
-          </el-col>
-          <el-col :span="24">
-            <el-form-item label="蓝色" prop="blue">
-              <el-slider
-                v-model="statusForm.blue"
-                :max=255
-                show-input>
-              </el-slider>
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-divider content-position="center"/>
-        <el-row>
-          <el-col :span="11">
-            <el-form-item label="空气温度" prop="airTemperature">
-              <el-tag placeholder="请输入空气温度" type="success">
-                {{ statusForm.airTemperature }} ℃
-              </el-tag>
-            </el-form-item>
-          </el-col>
-          <el-col :span="11" :offset="1">
-            <el-form-item label="空气湿度" prop="airHumidity">
-              <el-tag placeholder="请输入空气湿度" type="success">
-                {{ statusForm.airHumidity }} %RH
-              </el-tag>
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="statusSubmitForm(false)">确 定</el-button>
-        <el-button type="success" @click="statusSubmitForm(true)">应 用</el-button>
-        <el-button @click="statusCancel">取 消</el-button>
-      </div>
-    </el-dialog>
-
-    <!-- 添加或修改设备配置对话框 -->
-    <el-dialog
-      :title="setTitle"
-      :visible.sync="setOpen"
-      width="630px"
-      append-to-body
-    >
-      <el-form ref="setForm" :model="setForm" :rules="rules" label-width="120px">
-        <el-form-item label="雷达感应" prop="isRadar">
-          <el-switch
-            v-model="setForm.isRadar"
-            active-text="打开"
-            inactive-text="关闭"
-            :active-value=1 :inactive-value=0 >
-          </el-switch>
-        </el-form-item>
-
-        <el-form-item label="报警" prop="isAlarm">
-          <el-switch
-            v-model="setForm.isAlarm"
-            active-text="打开"
-            inactive-text="关闭"
-            :active-value=1 :inactive-value=0 >
-          </el-switch>
-        </el-form-item>
-
-        <el-form-item label="雷达感应间隔/s" prop="radarInterval">
-          <el-slider
-            v-model="setForm.radarInterval"
-            :min=1
-            :max=60
-            show-input>
-          </el-slider>
-        </el-form-item>
-
-        <el-divider content-position="center"/>
-        <el-form-item label="射频遥控" prop="isRfControl">
-          <el-switch
-            v-model="setForm.isRfControl"
-            active-text="打开"
-            inactive-text="关闭"
-            :active-value=1 :inactive-value=0 >
-          </el-switch>
-        </el-form-item>
-        <el-form-item label="遥控配对" prop="isRfLearn">
-          <el-switch
-            v-model="setForm.isRfLearn"
-            active-text="打开"
-            inactive-text="关闭"
-            :active-value=1 :inactive-value=0 >
-          </el-switch>
-        </el-form-item>
-        <el-form-item label="遥控清码" prop="isRfClear">
-          <el-switch
-            v-model="setForm.isRfClear"
-            active-text="打开"
-            inactive-text="关闭"
-            :active-value=1 :inactive-value=0 >
-          </el-switch>
-        </el-form-item>
-        <el-row>
-          <el-col :span="11">
-            <el-form-item label="按键一" prop="rfOneFunc">
-              <el-select v-model="setForm.rfOneFunc" placeholder="请选择按键一">
-                <el-option
-                  v-for="dict in rfFuncOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictLabel"
-                  :value="parseInt(dict.dictValue)"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="11" :offset="1">
-            <el-form-item label="按键二" prop="rfTwoFunc">
-              <el-select v-model="setForm.rfTwoFunc" placeholder="请选择按键二">
-                <el-option
-                  v-for="dict in rfFuncOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictLabel"
-                  :value="parseInt(dict.dictValue)"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="11">
-            <el-form-item label="按键三" prop="rfThreeFunc">
-              <el-select v-model="setForm.rfThreeFunc" placeholder="请选择按键三">
-                <el-option
-                  v-for="dict in rfFuncOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictLabel"
-                  :value="parseInt(dict.dictValue)"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-          <el-col :span="11" :offset="1">
-            <el-form-item label="按键四" prop="rfFourFunc">
-              <el-select v-model="setForm.rfFourFunc" placeholder="请选择按键四">
-                <el-option
-                  v-for="dict in rfFuncOptions"
-                  :key="dict.dictValue"
-                  :label="dict.dictLabel"
-                  :value="parseInt(dict.dictValue)"
-                ></el-option>
-              </el-select>
-            </el-form-item>
-          </el-col>
-        </el-row>
-
-        <el-divider content-position="center"/>
-        <el-form-item label="重启" prop="isReset">
-          <el-switch
-            v-model="setForm.isReset"
-            active-text="打开"
-            inactive-text="关闭"
-            :active-value=1 :inactive-value=0 active-color="#f56c6c">
-          </el-switch>
-        </el-form-item>
-        <el-form-item label="打开AP" prop="isAp">
-          <el-switch
-            v-model="setForm.isAp"
-            active-text="打开"
-            inactive-text="关闭"
-            :active-value=1 :inactive-value=0 active-color="#f56c6c">
-          </el-switch>
-        </el-form-item>
-
-        <!-- <el-form-item label="托管" prop="isHost">
-          <el-select v-model="setForm.isHost" placeholder="是否托管">
-            <el-option
-              v-for="dict in isHostOptions"
-              :key="dict.value"
-              :label="dict.label"
-              :value="parseInt(dict.value)"
-            ></el-option>
-          </el-select>
-        </el-form-item> -->
-
-      </el-form>
-      <div slot="footer" class="dialog-footer">
-        <el-button type="primary" @click="setSubmitForm(false)">确 定</el-button>
-        <el-button type="success" @click="setSubmitForm(true)">应 用</el-button>
-        <el-button @click="setCancel">取 消</el-button>
-      </div>
-    </el-dialog>
   </div>
 </template>
 
@@ -519,20 +224,15 @@
 
 <script>
 import {
-  listDevice,
-  getDevice,
-  delDevice,
-  addDevice,
-  updateDevice,
   exportDevice
 } from "@/api/system/device";
 import { getNewStatus, updateStatus } from "@/api/system/status";
 import { getNewSet, updateSet } from "@/api/system/set";
 import { listCategory } from "@/api/system/category";
-import {shoppingList} from "../../api/system/shopping";
+import {shoppingList, getShopping, updateShopping, addShopping, deleteShopping} from "../../api/system/shopping";
 
 export default {
-  name: "Device",
+  name: "Shopping",
   components: {},
   data() {
     return {
@@ -610,11 +310,14 @@ export default {
         pageSize: 10,
         groupId:0,
         shoppingNumber: null,
-        categoryId: null,
+        shoppingId: null,
         shoppingName: null,
-        firmwareVersion: null,
-        ownerId: null,
-        createTime: null
+        shoppingCreateBy: null,
+        shoppingStock: null,
+        shoppingRemark: null,
+        shoppingIntegral: null,
+        shoppingCreateTime: null,
+        remark: null
       },
       // 表单参数
       form: {},
@@ -622,17 +325,17 @@ export default {
       setForm: {},
       // 表单校验
       rules: {
-        deviceNum: [
+        shoppingNumber: [
           { required: true, message: "编号不能为空", trigger: "blur" }
         ],
-        deviceName: [
+        shoppingName: [
           { required: true, message: "名称不能为空", trigger: "blur" }
         ],
-        categoryId: [
-          {required:true,message:"设备分类不能为空",trigger: "blur"}
+        shoppingStock: [
+          { required:true, message:"库存不能为空",trigger: "blur"}
         ],
-        firmwareVersion: [
-          {required:true,message:"版本号不能为空", trigger: "blur"}
+        shoppingIntegral: [
+          {required:true,message:"所需积分不能为空", trigger: "blur"}
         ],
       }
     };
@@ -664,13 +367,11 @@ export default {
     getShoppingList() {
       this.loading = true;
       this.queryParams.params = {};
-      if (null != this.daterangeCreateTime && "" != this.daterangeCreateTime) {
-        this.queryParams.params[
-          "beginCreateTime"
-          ] = this.daterangeCreateTime[0];
+      if (null != this.daterangeCreateTime && "" !== this.daterangeCreateTime) {
+        this.queryParams.params["beginCreateTime"] = this.daterangeCreateTime[0];
         this.queryParams.params["endCreateTime"] = this.daterangeCreateTime[1];
       }
-      shoppingList().then(response =>{
+      shoppingList(this.queryParams).then(response =>{
         this.shoppingList = response.rows;
         console.log(this.shoppingList);
         this.total = response.total;
@@ -678,24 +379,6 @@ export default {
       })
     },
 
-
-    /** 查询设备列表 */
-    getList() {
-      this.loading = true;
-      this.queryParams.params = {};
-      if (null != this.daterangeCreateTime && "" != this.daterangeCreateTime) {
-        this.queryParams.params[
-          "beginCreateTime"
-          ] = this.daterangeCreateTime[0];
-        this.queryParams.params["endCreateTime"] = this.daterangeCreateTime[1];
-      }
-      listDevice(this.queryParams).then(response => {
-        this.deviceList = response.rows;
-        console.log(this.deviceList)
-        /*this.total = response.total;
-        this.loading = false;*/
-      });
-    },
     // 查询设备分类
     getCategoryList() {
       listCategory(this.queryCategoryParams).then(response => {
@@ -726,6 +409,7 @@ export default {
       this.open = false;
       this.reset();
     },
+
     statusCancel() {
       this.statusOpen = false;
       this.statusReset();
@@ -737,83 +421,46 @@ export default {
     // 表单重置
     reset() {
       this.form = {
-        deviceId: null,
-        deviceNum: null,
-        categoryId: null,
-        deviceName: null,
-        firmwareVersion: null,
-        ownerId: null,
-        createBy: null,
-        createTime: null,
-        updateBy: null,
-        updateTime: null,
-        remark: null
+        shoppingNumber: null,
+        shoppingId: null,
+        shoppingName: null,
+        shoppingCreateBy: null,
+        shoppingStock: null,
+        shoppingRemark: null,
+        shoppingIntegral: null,
+        shoppingCreateTime: null
       };
-      this.resetForm("form");
     },
     statusReset() {
       this.statusForm = {
-        deviceStatusId: null,
-        deviceId: null,
-        deviceNum: null,
-        relayStatus: null,
-        lightStatus: null,
-        isOnline: null,
-        deviceTemperature: null,
-        rssi: null,
-        airTemperature: null,
-        airHumidity: null,
-        triggerSource: null,
-        brightness: null,
-        lightInterval: null,
-        fadeTime: null,
-        lightMode: null,
-        red: null,
-        green: null,
-        blue: null,
-        createBy: null,
-        createTime: null,
-        updateBy: null,
-        updateTime: null,
-        remark: null
+        shoppingNumber: null,
+        shoppingId: null,
+        shoppingName: null,
+        shoppingCreateBy: null,
+        shoppingStock: null,
+        shoppingRemark: null,
+        shoppingIntegral: null,
+        shoppingCreateTime: null
       };
       this.resetForm("statusForm");
     },
     setReset() {
       this.setForm = {
-        deviceSetId: null,
-        deviceId: null,
-        deviceNum: null,
-        isAlarm: null,
-        isRadar: null,
-        radarInterval:null,
-        isHost: null,
-        isReset: null,
-        isAp: null,
-        isWifiOffline: null,
-        isOpenCertifi: null,
-        isRfControl: null,
-        isRfLearn: null,
-        isRfClear: null,
-        rfOneFunc: null,
-        rfTwoFunc: null,
-        rfThreeFunc: null,
-        rfFourFunc: null,
-        ownerId: null,
-        networkAddress: null,
-        networkIp: null,
-        createBy: null,
-        createTime: null,
-        updateBy: null,
-        updateTime: null,
-        remark: null
+        shoppingNumber: null,
+        shoppingId: null,
+        shoppingName: null,
+        shoppingCreateBy: null,
+        shoppingStock: null,
+        shoppingRemark: null,
+        shoppingIntegral: null,
+        shoppingCreateTime: null
       };
       this.resetForm("setForm");
     },
     /** 搜索按钮操作 */
     handleQuery() {
       this.queryParams.pageNum = 1;
-      this.getList();
+      this.getShoppingList();
     },
     /** 重置按钮操作 */
     resetQuery() {
@@ -831,16 +478,17 @@ export default {
     handleAdd() {
       this.reset();
       this.open = true;
-      this.title = "添加设备";
+      this.title = "添加商品信息";
     },
     /** 修改按钮操作 */
     handleUpdate(row) {
       this.reset();
-      const deviceId = row.deviceId || this.ids;
-      getDevice(deviceId).then(response => {
+      const shoppingId = row.shoppingId;
+      getShopping(shoppingId).then(response => {
+        console.log("121212--"+response.data);
         this.form = response.data;
         this.open = true;
-        this.title = "修改设备";
+        this.title = "修改商品信息";
       });
     },
     /** 状态按钮操作 */
@@ -867,17 +515,17 @@ export default {
     submitForm() {
       this.$refs["form"].validate(valid => {
         if (valid) {
-          if (this.form.deviceId != null) {
-            updateDevice(this.form).then(response => {
+          if (this.form.shoppingId != null) {
+            updateShopping(this.form).then(response => {
               this.msgSuccess("修改成功");
               this.open = false;
-              this.getList();
+              this.getShoppingList();
             });
           } else {
-            addDevice(this.form).then(response => {
+            addShopping(this.form).then(response => {
               this.msgSuccess("新增成功");
               this.open = false;
-              this.getList();
+              this.getShoppingList();
             });
           }
         }
@@ -892,7 +540,7 @@ export default {
               this.msgSuccess("更新成功");
               if(!isApply){
                 this.statusOpen = false;
-                this.getList();
+                this.getShoppingList();
               }
             });
           }
@@ -908,7 +556,7 @@ export default {
               this.msgSuccess("更新成功");
               if(!isApply){
                 this.setOpen = false;
-                this.getList();
+                this.getShoppingList();
               }
             });
           }
@@ -917,10 +565,10 @@ export default {
     },
     /** 删除按钮操作 */
     handleDelete(row) {
-      const deviceIds = row.deviceId || this.ids;
-      const deviceName = row.deviceName;
+      const shoppingId = row.shoppingId;
+      const shoppingName = row.shoppingName;
       this.$confirm(
-        '是否确认删除商品名称为"' + deviceName + '"的所有数据项?',
+        '是否确认删除商品名称为"' + shoppingName + '"的所有数据项?',
         "警告",
         {
           confirmButtonText: "确定",
@@ -929,10 +577,10 @@ export default {
         }
       )
         .then(function() {
-          return delDevice(deviceIds);
+          return deleteShopping(shoppingId);
         })
         .then(() => {
-          this.getList();
+          this.getShoppingList();
           this.msgSuccess("删除成功");
         });
     },

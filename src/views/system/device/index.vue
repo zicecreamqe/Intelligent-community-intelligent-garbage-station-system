@@ -179,6 +179,38 @@
           </div>
         </template>
       </el-table-column>
+      <el-table-column label="设备温度" align="center" prop="deviceTemperature">
+        <template v-if="scope.row.deviceTemperature != null" slot-scope="scope">
+          {{scope.row.deviceTemperature+'℃'}}
+        </template>
+        <template v-else slot-scope="scope">
+          {{scope.row.deviceTemperature}}
+        </template>
+      </el-table-column>
+      <el-table-column label="设备满度" align="center" prop="full">
+        <template v-if="scope.row.full != null" slot-scope="scope">
+          {{scope.row.full+'%'}}
+        </template>
+        <template v-else slot-scope="scope">
+          {{scope.row.full}}
+        </template>
+      </el-table-column>
+      <el-table-column label="设备湿度" align="center" prop="deviceHumidity">
+        <template v-if="scope.row.deviceHumidity != null" slot-scope="scope">
+          {{scope.row.deviceHumidity+'%'}}
+        </template>
+        <template v-else slot-scope="scope">
+          {{scope.row.deviceHumidity}}
+        </template>
+      </el-table-column>
+      <el-table-column label="气味浓度" align="center" prop="smell">
+        <template v-if="scope.row.smell != null" slot-scope="scope">
+          {{scope.row.smell+'%'}}
+        </template>
+        <template v-else slot-scope="scope">
+          {{scope.row.smell}}
+        </template>
+      </el-table-column>
       <el-table-column label="继电器" align="center" prop="relayStatus">
         <template slot-scope="scope">
           <el-switch v-model="scope.row.relayStatus" :active-value=1 :inactive-value=0 active-color="#13ce66" disabled></el-switch>
@@ -202,22 +234,6 @@
       <el-table-column label="遥控" align="center" prop="isRfControl">
         <template slot-scope="scope">
           <el-switch v-model="scope.row.isRfControl" :active-value=1 :inactive-value=0 disabled></el-switch>
-        </template>
-      </el-table-column>
-      <el-table-column label="设备温度" align="center" prop="deviceTemperature">
-        <template v-if="scope.row.deviceTemperature != null" slot-scope="scope">
-          {{scope.row.deviceTemperature+'℃'}}
-        </template>
-        <template v-else slot-scope="scope">
-          {{scope.row.deviceTemperature}}
-        </template>
-      </el-table-column>
-      <el-table-column label="设备满度" align="center" prop="full">
-        <template v-if="scope.row.full != null" slot-scope="scope">
-          {{scope.row.full+'%'}}
-        </template>
-        <template v-else slot-scope="scope">
-          {{scope.row.full}}
         </template>
       </el-table-column>
       <el-table-column label="配网地址" align="center" prop="networkAddress" />
@@ -684,7 +700,7 @@ import {
   updateDevice,
   exportDevice
 } from "@/api/system/device";
-import { getNewStatus, updateStatus } from "@/api/system/status";
+import { getNewStatus, updateStatus, addStatus } from "@/api/system/status";
 import { getNewSet, updateSet } from "@/api/system/set";
 import { listCategory } from "@/api/system/category";
 
@@ -903,6 +919,8 @@ export default {
         lightStatus: null,
         isOnline: null,
         deviceTemperature: null,
+        deviceHumidity: null,
+        smell: null,
         rssi: null,
         airTemperature: null,
         airHumidity: null,
@@ -1028,8 +1046,10 @@ export default {
             });
           } else {
             addDevice(this.form).then(response => {
-              this.msgSuccess("新增成功");
               this.open = false;
+            })
+            addStatus(this.form).then(response => {
+              this.msgSuccess("设备表和状态表新增成功(若设备添加失败请管理员删除状态表中无效数据）");
               this.getList();
             });
           }
