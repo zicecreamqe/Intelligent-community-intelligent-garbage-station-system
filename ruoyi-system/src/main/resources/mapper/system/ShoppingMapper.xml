@@ -18,6 +18,74 @@
     <select id="selectShoppingList" resultType="com.ruoyi.system.domain.Shopping" resultMap="ShoppingResult">
         select shopping_id, shopping_number, shopping_name, shopping_create_by,
                shopping_stock, shopping_integral, shopping_remark, shopping_create_time
-        from shopping;
+        from shopping
+        <where>
+            state = '1'
+            <if test="shoppingNumber != null  and shoppingNumber != ''">and shopping_number like concat('%', #{shoppingNumber}, '%')</if>
+            <if test="shoppingId != null ">and shopping_id = #{shoppingId}</if>
+            <if test="shoppingName != null  and shoppingName != ''">and shopping_name like concat('%', #{shoppingName}, '%')</if>
+            <if test="shoppingStock != null  and shoppingStock != ''">and shopping_stock like concat('%', #{shoppingStock}, '%')</if>
+            <if test="shoppingIntegral != null  and shoppingIntegral != ''">and shopping_integral like concat('%', #{shoppingIntegral}, '%')</if>
+            <if test="shoppingCreateBy != null  and shoppingCreateBy != ''">and shopping_create_by like concat('%', #{shoppingCreateBy}, '%')</if>
+            <if test="params.beginCreateTime != null and params.beginCreateTime != '' and params.beginCreateTime != 'undefined' and params.endCreateTime != null and params.endCreateTime != '' and params.endCreateTime != 'undefined'">
+                and shopping_create_time between #{params.beginCreateTime} and #{params.endCreateTime}
+            </if>
+        </where>
     </select>
+
+    <select id="selectShoppingById" resultType="com.ruoyi.system.domain.Shopping" resultMap="ShoppingResult">
+        select shopping_id, shopping_number, shopping_name, shopping_create_by,
+               shopping_stock, shopping_integral, shopping_remark, shopping_create_time
+        from shopping
+        where shopping_id = #{shoppingId};
+    </select>
+
+    <update id="updateShopping">
+        update shopping
+        <trim prefix="SET" suffixOverrides=",">
+            <if test="shoppingNumber != null  and shoppingNumber != ''">shopping_number = #{shoppingNumber},</if>
+            <if test="shoppingName != null  and shoppingName != ''">shopping_name = #{shoppingName},</if>
+            <if test="shoppingStock != null  and shoppingStock != ''">shopping_stock = #{shoppingStock},</if>
+            <if test="shoppingIntegral != null  and shoppingIntegral != ''">shopping_integral = #{shoppingIntegral},</if>
+            <if test="remark != null  and remark != ''">shopping_remark = #{remark},</if>
+        </trim>
+        where shopping_id = #{shoppingId}
+    </update>
+
+    <select id="selectShoppingByNumber" resultType="com.ruoyi.system.domain.Shopping">
+        select shopping_id, shopping_number, shopping_name, shopping_create_by,
+               shopping_stock, shopping_integral, shopping_remark, shopping_create_time
+        from shopping
+        where shopping_number = #{shoppingNumber};
+    </select>
+
+    <insert id="insertShopping">
+        insert into shopping
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="shoppingNumber != null  and shoppingNumber != ''">shopping_number,</if>
+            <if test="shoppingName != null  and shoppingName != ''">shopping_name,</if>
+            <if test="shoppingStock != null  and shoppingStock != ''">shopping_stock,</if>
+            <if test="shoppingIntegral != null  and shoppingIntegral != ''">shopping_integral,</if>
+            <if test="shoppingCreateBy != null  and shoppingCreateBy != ''">shopping_create_by,</if>
+            <if test="shoppingCreateTime != null">shopping_create_time,</if>
+            <if test="remark != null  and remark != ''">shopping_remark,</if>
+            <if test="state != null  and state != ''"> state,</if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="shoppingNumber != null  and shoppingNumber != ''">#{shoppingNumber},</if>
+            <if test="shoppingName != null  and shoppingName != ''">#{shoppingName},</if>
+            <if test="shoppingStock != null  and shoppingStock != ''">#{shoppingStock},</if>
+            <if test="shoppingIntegral != null  and shoppingIntegral != ''">#{shoppingIntegral},</if>
+            <if test="shoppingCreateBy != null  and shoppingCreateBy != ''">#{shoppingCreateBy},</if>
+            <if test="shoppingCreateTime != null">#{shoppingCreateTime} ,</if>
+            <if test="remark != null  and remark != ''">#{remark},</if>
+            <if test="state != null  and state != ''">#{state} ,</if>
+        </trim>
+    </insert>
+
+    <delete id="deleteShoppingById">
+        delete from shopping where shopping_id = #{shoppingId}
+    </delete>
+
+
 </mapper>

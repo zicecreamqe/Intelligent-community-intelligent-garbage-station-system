@@ -44,6 +44,7 @@
         <result property="deviceHumidity" column="device_humidity"/>
         <result property="rssi" column="rssi"/>
         <result property="full" column="full"/>
+        <result property="smell" column="smell"/>
         <result property="remark" column="remark"/>
     </resultMap>
 
@@ -66,7 +67,7 @@
 
     <sql id="selectIotDeviceListVo">
         select d.device_id,d.status, d.device_num, d.category_id, d.device_name, d.firmware_version, d.owner_id, d.create_time,
-        s.relay_status,s.light_status,s.is_online,s.rssi,s.device_temperature,s.full,s.device_humidity,
+        s.relay_status,s.light_status,s.is_online,s.rssi,s.device_temperature,s.full,s.device_humidity,s.smell,
         t.network_address, t.network_ip,t.is_alarm, t.is_radar,t.is_rf_control,
         u.nick_name,
         c.category_name

@@ -8,5 +8,15 @@ import java.util.List;
 @Repository
 public interface ShoppingMapper {
 
-    public List<Shopping> selectShoppingList();
+    public List<Shopping> selectShoppingList(Shopping shopping);
+
+    Shopping selectShoppingById(Long shoppingId);
+
+    int updateShopping(Shopping shopping);
+
+    Shopping selectShoppingByNumber(String shoppingNumber);
+
+    int insertShopping(Shopping shopping);
+
+    int deleteShoppingById(Long shoppingId);
 }

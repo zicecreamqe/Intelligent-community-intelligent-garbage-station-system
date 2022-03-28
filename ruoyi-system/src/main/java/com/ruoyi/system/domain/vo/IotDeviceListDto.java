@@ -148,11 +148,11 @@ public class IotDeviceListDto extends BaseEntity {
         this.deviceHumidity = deviceHumidity;
     }
 
-    public Integer getFull() {
+    public Double getFull() {
         return full;
     }
 
-    public void setFull(Integer full) {
+    public void setFull(Double full) {
         this.full = full;
     }
 
@@ -166,7 +166,21 @@ public class IotDeviceListDto extends BaseEntity {
      * 设备满度
      */
     @Excel(name = "满度")
-    private Integer full;
+    private Double full;
+
+    /**
+     * 设备气味浓度
+     */
+    @Excel(name = "气味")
+    private Double smell;
+
+    public Double getSmell() {
+        return smell;
+    }
+
+    public void setSmell(Double smell) {
+        this.smell = smell;
+    }
 
     @Excel(name = "备注")
     private String  remark;

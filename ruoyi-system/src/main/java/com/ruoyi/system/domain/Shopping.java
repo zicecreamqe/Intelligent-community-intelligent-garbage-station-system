@@ -1,5 +1,6 @@
 package com.ruoyi.system.domain;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.ruoyi.common.annotation.Excel;
 import com.ruoyi.common.core.domain.BaseEntity;
 
@@ -50,9 +51,24 @@ public class Shopping extends BaseEntity {
     private int shoppingStock;
 
     /**
+     * 启用状态
+     */
+    @Excel(name = "状态")
+    private int state;
+
+    public int getState() {
+        return state;
+    }
+
+    public void setState(int state) {
+        this.state = state;
+    }
+
+    /**
      * 创建时间
      */
     @Excel(name = "创建时间")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss")
     private Date shoppingCreateTime;
 
     public Long getShoppingId() {
