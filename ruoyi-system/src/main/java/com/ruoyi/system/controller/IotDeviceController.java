@@ -40,8 +40,8 @@ import javax.validation.constraints.Size;
 /**
  * 设备Controller
  *
- * @author kerwincui
- * @date 2021-05-06
+ * @author ztqees
+ * @date 2021-12-06
  */
 @Api(value = "设备", tags = "设备")
 @RestController
